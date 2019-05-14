@@ -1,0 +1,14 @@
+{
+  "name": "mermaid-charts",
+  "version": "0.0.0",
+  "description": "My personal Mermaid charts",
+  "main": "index.js",
+  "repository": "git@github.com:shane-tomlinson/mermaid-charts.git",
+  "author": "Shane Tomlinson <stomlinson@mozilla.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "mermaid": "^8.0.0",
+    "mermaid.cli": "^0.5.1"
+  }
+}

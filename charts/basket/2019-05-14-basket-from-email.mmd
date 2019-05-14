@@ -1,0 +1,15 @@
+sequenceDiagram
+participant EM as Email
+participant BA as basket.mozilla.org
+participant FxA as FxA
+
+
+EM->>BA: User clicks "Manage subscriptions", link contains email address
+BA-->>BA: Create state token, stores in a sessionCookie
+BA->>FxA: Redirect to FxA w/ state, client_id, scope: openid
+FxA-->>FxA: User authenticates
+FxA->>BA: Redirect to basket w/ state, code
+BA-->>BA: Check state from URL is same as state in sessionCookie
+BA-->>FxA: Trade code for access_token, id_token
+FxA-->>BA: Return access_token, id_token
+BA-->>BA: Use info from id_token to open user's email preferences page
