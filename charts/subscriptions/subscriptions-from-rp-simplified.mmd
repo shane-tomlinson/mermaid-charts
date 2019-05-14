@@ -1,0 +1,13 @@
+sequenceDiagram
+participant UA as Start
+participant RP as Relying Party
+participant FxA as Firefox Accounts
+participant FxAP as FxA Payments
+
+UA->>RP: User visits site
+RP->>FxA: User clicks login
+FxA-->>FxA: User Authenticates, authorizes
+FxA->>FxAP: Redirect to payments to manage subscriptions
+FxAP-->>FxAP: Store subscription updates
+FxAP->>FxA: Return to FxA
+FxA->>RP: Return to RP with authorization code

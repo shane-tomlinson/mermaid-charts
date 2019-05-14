@@ -1,0 +1,31 @@
+sequenceDiagram
+participant UA as User-Agent<br>(Browser)
+participant FxA as FxA Content<br>accounts.firefox.com
+participant FxAO as FxA OAuth<br>oauth.accounts.firefox.com
+participant FxAP as FxA Payments<br>payments.accounts.firefox.com
+participant RP as Relying Party
+
+UA->>RP: User visits site
+RP->>UA: Display UI
+UA->>RP: User clicks login
+RP-->>RP: Generate state token
+RP->>UA: Set cookie with state token, initiate redirect to FxA
+UA->>FxA: Redirect to FxA w/ state token
+FxA->>UA: Display UI
+UA->>UA: Authenticate, authorize, generate PKCE params
+UA->>FxA: Send PKCE code_verifier, state
+FxA-->>FxA: Generate encrypted/signed cookie w/ code_verifier, state
+FxA->>UA: Set cookie w/ code_verifier, state
+UA->>FxAO: Send authorization, PKCE code_challenge
+FxAO-->>FxAO: Generate code, store PKCE code_verifier
+FxAO->>UA: Initiate redirect to FxA Payments w/ code, state
+UA->>FxAP: Redirect to FxA Payments w/ code, state
+FxAP->>UA: Display UI
+UA->>FxA: Send cookie w/ code_verifier, state
+FxA->>UA: Return code_verifier, state
+UA-->>UA: Compare state from cookie w/ state in URL
+alt state token match
+UA->>FxAO: Send code to FxA to trade for access token
+else state token mismatch
+ RP->>RP: Inform user of an error occurred
+end

@@ -1,0 +1,32 @@
+sequenceDiagram
+participant UA as User-Agent<br>(Browser)
+participant RP as Relying Party
+participant FxA as FxA Content<br>accounts.firefox.com
+participant FxAO as FxA OAuth<br>oauth.accounts.firefox.com
+participant FxAP as FxA Payments<br>payments.accounts.firefox.com
+
+UA->>RP: User visits site
+RP->>UA: Display UI
+UA->>RP: User clicks login
+RP-->>RP: Generate state token
+RP->>UA: Set cookie with state token, initiate redirect to FxA
+UA->>FxA: Redirect to FxA w/ state token
+FxA->>UA: Display UI
+UA->>UA: Authenticate, authorize.
+UA-->>FxAO: Request access token
+FxAO-->>FxAO: Generate, store access token
+FxAO-->>UA: Return access token
+UA-->>UA: Create access token hash
+UA-->>FxA: Send access token hash
+FxA-->>UA: Set cookie with access token hash
+UA->>FxAP: Redirect with access token in URL fragment
+FxAP->>UA: Display UI
+UA-->>FxA: Get access token hash from cookie
+FxA-->>UA: Return access token hash
+UA-->>UA: Generate access token hash from URL fragment
+UA-->>UA: Compare access token hash from URL with hash from cookie
+alt hashes match
+  UA-->>UA: Use access token
+else hash mismatch
+  UA->>UA: Inform user of an error occurred
+end

@@ -1,0 +1,24 @@
+sequenceDiagram
+participant UA as User-Agent<br>(Browser)
+participant FxA as Firefox Accounts
+participant RP as Relying Party
+
+UA->>RP: User visits site
+RP->>UA: Display UI
+UA->>RP: User clicks login
+RP-->>RP: Generate state token
+RP->>UA: Set cookie with state token, initiate redirect to FxA
+UA->>FxA: Redirect to FxA w/ state token
+FxA->>UA: Display UI
+UA->>UA: Authenticate, authorize
+UA->>FxA: Send authorization
+FxA-->>FxA: Generate OAuth credentials
+FxA->>UA: Initiate redirect to RP w/ OAuth credentials, state token
+UA->>RP: Redirect to RP w/ OAuth credentials, state token, cookie
+RP-->>RP: Compare state token in URL w/ state token in cookie
+alt state token match
+  RP->>FxA: Use OAuth credentials
+else state token mismatch
+  RP->>UA: Inform user an error occurred
+end
+

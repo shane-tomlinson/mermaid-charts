@@ -1,0 +1,9 @@
+sequenceDiagram
+participant UA as Start
+participant RP as Relying Party
+participant FxA as Firefox Accounts
+
+UA->>RP: User visits site
+RP->>FxA: User clicks login
+FxA-->>FxA: User Authenticates, authorizes
+FxA->>RP: Return to RP with OAuth credentials
