@@ -1,0 +1,18 @@
+sequenceDiagram
+participant UA as Start
+participant RP as Relying Party
+participant FxA as Firefox Accounts
+participant FxAP as FxA Payments
+
+UA->>RP: User visits RP
+RP->>FxA: User clicks login
+FxA-->>FxA: User Authenticates
+FxA->>FxAP: Redirect to subscription server to setup OAuth process
+FxAP-->>FxAP: Setup OAuth process (create, store state token)
+FxAP->>FxA: Redirect to FxA w/ prompt=none
+FxA-->>FxA: Generate OAuth creds for subscription server
+FxA->>FxAP: Redirect to subscription server w/ OAuth creds
+FxAP-->>FxAP: User updates subscriptions
+FxAP->>FxA: Return to FxA `
+FxA-->>FxA: Generate OAuth creds for RP
+FxA->>RP: Return to RP with RP's creds

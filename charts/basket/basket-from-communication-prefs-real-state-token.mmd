@@ -1,0 +1,14 @@
+sequenceDiagram
+participant FxA as FxA
+participant BA as basket.mozilla.org
+
+FxA-->>FxA: User authenticates
+FxA-->>FxA: User opens FxA /settings, clicks Email preferences link
+FxA-->>BA: Redirect to Basket to initialize OAuth dance
+BA-->>BA: Create state token, stores in a sessionCookie
+BA->>FxA: Redirect to FxA w/ state, client_id, scope: openid, prompt=none
+FxA->>BA: Redirect to basket w/ state, code
+BA-->>BA: Check state from URL is same as state in sessionCookie
+BA-->>FxA: Trade code for access_token, id_token
+FxA-->>BA: Return access_token, id_token
+BA-->>BA: Use info from id_token to open user's email preferences page
