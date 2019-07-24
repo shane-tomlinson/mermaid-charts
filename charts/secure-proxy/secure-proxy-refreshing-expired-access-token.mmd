@@ -1,0 +1,19 @@
+sequenceDiagram
+participant UA as Browser Addon
+participant FxA as FxA Content Server
+participant FxAA as FxA Authorization Server
+participant FxAP as FxA Profile Server
+participant SP as Secure Proxy
+participant IN as Internet
+
+UA->>SP: Send network traffic to secure proxy w/ access_token sent in Proxy-Authorization header
+SP-->>SP: Verify access token, see access token is expired
+SP->>UA: Return an error code indicating access token has expired
+UA->>FxAA: Use refresh_token to fetch access_token w/ `https://identity.mozilla.com/apps/secure-proxy` scope
+FxAA->>UA: Return access_token w/ `https://identity.mozilla.com/apps/secure-proxy` scope
+UA->>SP: Send network traffic to secure proxy w/ access_token sent in Proxy-Authorization header
+SP-->>SP: Verify access token, access token is valid
+SP->>IN: Forward network traffic
+IN->>SP: Return network responses
+SP->>UA: Return network responses
+

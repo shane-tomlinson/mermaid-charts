@@ -1,0 +1,28 @@
+sequenceDiagram
+participant UA as Browser Addon
+participant FxA as FxA Content Server
+participant FxAA as FxA Authorization Server
+participant FxAP as FxA Profile Server
+participant SP as Secure Proxy
+participant IN as Internet
+
+UA->>FxA: Open tab to FxA's /authorization page
+FxA->>FxAA: User authenticates, authorizes
+FxAA-->>FxAA: Generate OAuth code
+FxAA->>FxA: Return OAuth code
+FxA->>UA: Redirect with OAuth code
+UA->>FxAA: Trade code for access_token, refresh_token
+FxAA->>UA: Return access_token, refresh_token w/ scope=`profile https://identity.mozilla.com/apps/secure-proxy`
+UA->>FxAA: Use refresh_token to fetch access_token w/ `profile` scope
+FxAA->>UA: Return access_token w/ `profile` scope
+UA->>FxAP: Use access_token to fetch profile info
+FxAP->>UA: Return profile info
+UA-->>UA: Display profile info
+UA->>FxAA: Use refresh_token to fetch access_token w/ `https://identity.mozilla.com/apps/secure-proxy` scope
+FxAA->>UA: Return access_token w/ `https://identity.mozilla.com/apps/secure-proxy` scope
+UA->>SP: Send network traffic to secure proxy w/ access_token sent in Proxy-Authorization header
+SP-->>SP: Verify access token, verification succeeds
+SP->>IN: Forward network traffic
+IN->>SP: Return network responses
+SP->>UA: Return network responses
+
