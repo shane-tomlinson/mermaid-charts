@@ -1,0 +1,32 @@
+sequenceDiagram
+participant UA as Browser Addon
+participant FPN as Fx Priv Network Server
+participant FxA as FxA Content Server
+participant FxAA as FxA Authorization Server
+participant FxAP as FxA Profile Server
+participant CF as Cloudflare
+participant IN as Internet
+
+UA->>FxA: Open tab to FxA's /authorization page
+FxA->>FxAA: User authenticates, authorizes
+FxAA-->>FxAA: Generate OAuth code
+FxAA->>FxA: Return OAuth code
+FxA->>UA: Redirect with OAuth code
+UA->>FPN: Send code, state to backend
+FPN->>FxAA: Using server held client_secret, trade code, state for access_token, refresh_token
+FxAA->>FPN: Return access_token, refresh_token w/ scope=`profile https://identity.mozilla.com/apps/secure-proxy`
+FPN->>FxAA: Use refresh_token to fetch access_token w/ `profile` scope
+FxAA->>FPN: Return access_token w/ `profile` scope
+FPN->>FxAP: Use access_token to fetch profile info
+FxAP->>FPN: Return profile info, including subscription info.
+FPN-->>FPN: Check if user is allowed to use proxy by looking at subscriptions or lookup in internal DB by uid.
+FPN->>FxAA: Use refresh_token to fetch access_token w/ `https://identity.mozilla.com/apps/secure-proxy` scope
+FxAA->>FPN: Return access_token w/ `https://identity.mozilla.com/apps/secure-proxy` scope
+FPN->>UA: Return bundle w/ access_token for cloudflare, refresh_token, profile info
+UA-->>UA: Display profile info
+UA->>CF: Send network traffic to secure proxy w/ access_token sent in Proxy-Authorization header
+CF-->>CF: Verify access token, verification succeeds
+CF->>IN: Forward network traffic
+IN->>CF: Return network responses
+CF->>UA: Return network responses
+
