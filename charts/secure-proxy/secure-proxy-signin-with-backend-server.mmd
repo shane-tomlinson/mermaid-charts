@@ -7,14 +7,19 @@ participant FxAP as FxA Profile Server
 participant CF as Cloudflare
 participant IN as Internet
 
-UA->>FxA: Open tab to FxA's /authorization page
+UA->>FPN: Request state token from FPN
+FPN-->>FPN: Create state token, associate with local session
+FPN->>UA: Return state token
+UA->>FxA: Open tab to FxA's /authorization page w/ state token
 FxA->>FxAA: User authenticates, authorizes
 FxAA-->>FxAA: Generate OAuth code
-FxAA->>FxA: Return OAuth code
-FxA->>UA: Redirect with OAuth code
-UA->>FPN: Send code, state to backend
+FxAA->>FxA: Return OAuth code,
+FxA->>UA: Redirect with OAuth code, state
+UA->>FPN: Send code, state to FPN
+FPN-->>FPN: Check state vs state stored in local session. If match, continue.
 FPN->>FxAA: Using server held client_secret, trade code, state for access_token, refresh_token
 FxAA->>FPN: Return access_token, refresh_token w/ scope=`profile https://identity.mozilla.com/apps/secure-proxy`
+FPN-->>FPN: Associate refresh_token with session (db, encrypted cookie, etc)
 FPN->>FxAA: Use refresh_token to fetch access_token w/ `profile` scope
 FxAA->>FPN: Return access_token w/ `profile` scope
 FPN->>FxAP: Use access_token to fetch profile info

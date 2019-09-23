@@ -10,8 +10,9 @@ participant IN as Internet
 UA->>SP: Send network traffic to secure proxy w/ access_token sent in Proxy-Authorization header
 SP-->>SP: Verify access token, see access token is expired
 SP->>UA: Return an error code indicating access token has expired
-UA->>FPN: Send refresh_token to backend
-FPN->>FxAA: Use refresh_token to fetch access_token w/ `profile` scope
+UA->>FPN: Request new access token
+FPN-->>FPN: Get refresh_token from session info (db, encrypted cookie, etc)
+FPN->>FxAA: Use refresh_token, client_secret to fetch access_token w/ `profile` scope
 FxAA->>FPN: Return access_token w/ `profile` scope
 FPN->>FxAP: Use access_token to fetch profile info
 FxAP->>FPN: Return profile info, including subscription info.
